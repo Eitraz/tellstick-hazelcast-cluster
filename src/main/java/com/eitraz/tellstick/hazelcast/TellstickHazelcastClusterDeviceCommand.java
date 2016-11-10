@@ -20,10 +20,27 @@ public class TellstickHazelcastClusterDeviceCommand implements Callable<Boolean>
 
     private final String deviceName;
     private final String command;
+    private int callCounter = 0;
 
     public TellstickHazelcastClusterDeviceCommand(String deviceName, String command) {
         this.deviceName = deviceName;
         this.command = command;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void increaseCallCounter() {
+        callCounter++;
+    }
+
+    public int getCallCounter() {
+        return callCounter;
     }
 
     @Override
