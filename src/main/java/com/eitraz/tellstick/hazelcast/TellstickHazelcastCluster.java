@@ -25,7 +25,7 @@ public class TellstickHazelcastCluster {
     @SuppressWarnings("FieldCanBeLocal")
     private final Thread deviceCommandQueueExecuteThread;
     private final BlockingQueue<TellstickHazelcastClusterDeviceCommand> deviceCommandQueue = new LinkedBlockingDeque<>();
-    private final Map<String, String> lastDeviceCommands = new ConcurrentHashMap<>();
+    private final Map<String, Integer> lastDeviceCommands = new ConcurrentHashMap<>();
 
     public TellstickHazelcastCluster() {
         this(Hazelcast.newHazelcastInstance());
@@ -44,7 +44,7 @@ public class TellstickHazelcastCluster {
                     internalExecuteDeviceCommand(deviceCommandQueue.take());
 
                     // Wait a bit
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     logger.warn("Interrupted while waiting to execute command", e);
                 }
@@ -70,7 +70,7 @@ public class TellstickHazelcastCluster {
         return new TellstickHazelcastClusterDevice(this, deviceName);
     }
 
-    synchronized void executeDeviceCommand(String deviceName, String command) {
+    synchronized void executeDeviceCommand(String deviceName, Integer command) {
         if (command.equals(lastDeviceCommands.get(deviceName)))
             return;
 
@@ -94,7 +94,8 @@ public class TellstickHazelcastCluster {
             deviceCommandQueue.offer(command);
         }
 
-        long executedOnNodes = futures.values().stream()
+        long executedOnNodes = futures
+                .values().stream()
                 .map(f -> {
                     try {
                         return f.get(5000, TimeUnit.SECONDS);
