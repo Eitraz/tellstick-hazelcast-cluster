@@ -32,7 +32,7 @@ public class TellstickHazelcastClusterNode implements CommandLineRunner {
     public HazelcastInstance hazelcast() {
         Config config = new Config();
         NetworkConfig networkConfig = config.getNetworkConfig();
-        networkConfig.setOutboundPorts(Collections.singletonList(5701));
+        networkConfig.setPort(5701);
         networkConfig.setPortAutoIncrement(false);
         return Hazelcast.newHazelcastInstance(config);
     }
