@@ -27,10 +27,6 @@ public class TellstickHazelcastCluster {
     private final BlockingQueue<TellstickHazelcastClusterDeviceCommand> deviceCommandQueue = new LinkedBlockingDeque<>();
     private final Map<String, Integer> lastDeviceCommands = new ConcurrentHashMap<>();
 
-    public TellstickHazelcastCluster() {
-        this(Hazelcast.newHazelcastInstance());
-    }
-
     public TellstickHazelcastCluster(HazelcastInstance hazelcast) {
         deviceCommandExecutorService = hazelcast.getExecutorService(DEVICE_COMMAND_EXECUTOR_SERVICE);
         hazelcast.<Map<String, String>>getTopic(RAW_DEVICE_EVENTS_TOPIC)

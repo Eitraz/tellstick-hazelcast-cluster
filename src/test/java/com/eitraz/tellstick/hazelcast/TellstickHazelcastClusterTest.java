@@ -1,5 +1,6 @@
 package com.eitraz.tellstick.hazelcast;
 
+import com.hazelcast.core.Hazelcast;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -9,7 +10,7 @@ public class TellstickHazelcastClusterTest {
 
     @Test
     public void testOnOff() throws Exception {
-        TellstickHazelcastCluster tellstick = new TellstickHazelcastCluster();
+        TellstickHazelcastCluster tellstick = new TellstickHazelcastCluster(Hazelcast.newHazelcastInstance());
 
         TellstickHazelcastClusterDevice device = tellstick.getDevice("TestDevice");
 

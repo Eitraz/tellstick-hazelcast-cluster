@@ -1,5 +1,7 @@
 package com.eitraz.tellstick.hazelcast;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
@@ -8,6 +10,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import java.util.Collections;
 
 import static com.eitraz.tellstick.hazelcast.TellstickHazelcastCluster.RAW_DEVICE_EVENTS_TOPIC;
 import static com.eitraz.tellstick.hazelcast.TellstickHazelcastClusterNodeGlobals.TELLSTICK;
@@ -26,7 +30,11 @@ public class TellstickHazelcastClusterNode implements CommandLineRunner {
 
     @Bean(name = "hazelcast")
     public HazelcastInstance hazelcast() {
-        return Hazelcast.newHazelcastInstance();
+        Config config = new Config();
+        NetworkConfig networkConfig = config.getNetworkConfig();
+        networkConfig.setOutboundPorts(Collections.singletonList(5701));
+        networkConfig.setPortAutoIncrement(false);
+        return Hazelcast.newHazelcastInstance(config);
     }
 
     @Bean(name = "tellstick")
