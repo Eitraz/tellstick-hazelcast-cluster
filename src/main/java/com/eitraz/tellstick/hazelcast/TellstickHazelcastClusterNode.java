@@ -1,6 +1,8 @@
 package com.eitraz.tellstick.hazelcast;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.ManagementCenterConfig;
+import com.hazelcast.config.MulticastConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -31,9 +33,14 @@ public class TellstickHazelcastClusterNode implements CommandLineRunner {
     @Bean(name = "hazelcast")
     public HazelcastInstance hazelcast() {
         Config config = new Config();
+        ManagementCenterConfig managementCenterConfig = config.getManagementCenterConfig();
+        managementCenterConfig.setEnabled(true);
+        managementCenterConfig.setUrl("http://192.168.1.30:8080/mancenter");
+
         NetworkConfig networkConfig = config.getNetworkConfig();
         networkConfig.setPort(5701);
         networkConfig.setPortAutoIncrement(false);
+
         return Hazelcast.newHazelcastInstance(config);
     }
 
