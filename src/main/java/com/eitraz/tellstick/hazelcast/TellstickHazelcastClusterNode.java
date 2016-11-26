@@ -7,12 +7,16 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 
 import static com.eitraz.tellstick.hazelcast.TellstickHazelcastCluster.RAW_DEVICE_EVENTS_TOPIC;
@@ -20,6 +24,9 @@ import static com.eitraz.tellstick.hazelcast.TellstickHazelcastClusterNodeGlobal
 
 @SpringBootApplication
 public class TellstickHazelcastClusterNode implements CommandLineRunner {
+    private static final Logger logger = LogManager.getLogger();
+    public static final String IP_PROPERTY = "ip";
+
     @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     @Autowired
     private TellstickBean tellstick;
@@ -33,15 +40,14 @@ public class TellstickHazelcastClusterNode implements CommandLineRunner {
     @Bean(name = "hazelcast")
     public HazelcastInstance hazelcast() {
         Config config = new Config();
-        ManagementCenterConfig managementCenterConfig = config.getManagementCenterConfig();
-        managementCenterConfig.setEnabled(true);
-        managementCenterConfig.setUrl("http://192.168.1.30:8080/mancenter");
+        config.setProperty("hazelcast.local.localAddress", System.getProperty("ip"));
 
         NetworkConfig networkConfig = config.getNetworkConfig();
+        networkConfig.setPublicAddress(System.getProperty("ip"));
         networkConfig.setPort(5701);
         networkConfig.setPortAutoIncrement(false);
 
-        return Hazelcast.newHazelcastInstance(config);
+        return Hazelcast.newHazelcastInstance();
     }
 
     @Bean(name = "tellstick")
@@ -60,6 +66,21 @@ public class TellstickHazelcastClusterNode implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
+        setSystemIpProperty();
         SpringApplication.run(TellstickHazelcastClusterNode.class, args);
+    }
+
+    public static void setSystemIpProperty() {
+        if (System.getProperty("ip") == null) {
+            try {
+                String address = InetAddress.getLocalHost().getHostAddress();
+                System.setProperty("ip", address);
+                logger.info(String.format("System property 'ip' set to %s", address));
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            logger.info(String.format("System property 'ip' is set to %s", System.getProperty(IP_PROPERTY)));
+        }
     }
 }
