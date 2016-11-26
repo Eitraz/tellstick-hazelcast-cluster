@@ -47,7 +47,7 @@ public class TellstickHazelcastClusterNode implements CommandLineRunner {
         networkConfig.setPort(5701);
         networkConfig.setPortAutoIncrement(false);
 
-        return Hazelcast.newHazelcastInstance();
+        return Hazelcast.newHazelcastInstance(config);
     }
 
     @Bean(name = "tellstick")
