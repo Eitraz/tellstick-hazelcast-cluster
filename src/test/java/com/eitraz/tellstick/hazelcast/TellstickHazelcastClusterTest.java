@@ -5,12 +5,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
+import java.time.Duration;
+
 public class TellstickHazelcastClusterTest {
     private static final Logger logger = LogManager.getLogger();
 
     @Test
     public void testOnOff() throws Exception {
-        TellstickHazelcastCluster tellstick = new TellstickHazelcastCluster(Hazelcast.newHazelcastInstance());
+        TellstickHazelcastCluster tellstick = new TellstickHazelcastCluster(Hazelcast.newHazelcastInstance(), Duration.ofSeconds(1));
 
         TellstickHazelcastClusterDevice device = tellstick.getDevice("TestDevice");
 
