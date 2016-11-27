@@ -30,7 +30,7 @@ RUN rm -rf /tellstick-hazelcast-cluster
 RUN git clone https://github.com/Eitraz/tellstick-hazelcast-cluster.git && \
     cd tellstick-hazelcast-cluster && \
     mvn clean package -DskipTests && \
-    cp target/tellstick-hazelcast-cluster-*.jar /tellstick-hazelcast-cluster.jar && \
+    cp target/tellstick-hazelcast-cluster-*-exec.jar /tellstick-hazelcast-cluster.jar && \
     rm -rf /tellstick-hazelcast-cluster
 
 RUN rm -rf ~/.m2
