@@ -9,6 +9,7 @@ import com.hazelcast.core.Member;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -27,7 +28,7 @@ public class TellstickHazelcastCluster {
     private final BlockingQueue<TellstickHazelcastClusterDeviceCommand> deviceCommandQueue = new LinkedBlockingDeque<>();
     private final Map<String, Integer> lastDeviceCommands = new ConcurrentHashMap<>();
 
-    public TellstickHazelcastCluster(HazelcastInstance hazelcast) {
+    public TellstickHazelcastCluster(HazelcastInstance hazelcast, Duration timeBetweenRedelivery) {
         deviceCommandExecutorService = hazelcast.getExecutorService(DEVICE_COMMAND_EXECUTOR_SERVICE);
         hazelcast.<Map<String, String>>getTopic(RAW_DEVICE_EVENTS_TOPIC)
                 .addMessageListener(message -> fireRawDeviceEvent(new RawDeviceEvent(message.getMessageObject())));
@@ -40,7 +41,7 @@ public class TellstickHazelcastCluster {
                     internalExecuteDeviceCommand(deviceCommandQueue.take());
 
                     // Wait a bit
-                    Thread.sleep(1000);
+                    Thread.sleep(timeBetweenRedelivery.toMillis());
                 } catch (InterruptedException e) {
                     logger.warn("Interrupted while waiting to execute command", e);
                 }
